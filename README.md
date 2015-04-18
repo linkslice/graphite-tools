@@ -1,2 +1,2 @@
 # graphite-tools
-miscellaneous grpahite tools
+miscellaneous graphite tools
