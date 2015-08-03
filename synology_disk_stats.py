@@ -11,7 +11,7 @@ import socket
 import struct
 import time
 
-os.environ['MIBS'] = 'all' # install F5 mibs in net-snmp mibs directory
+os.environ['MIBS'] = 'all' # install mibs in net-snmp mibs directory
                            # usually /usr/share/snmp/mibs
 
 package = ([])
