@@ -61,6 +61,8 @@ def makeNagios(metric, warning, critical):
 
     severity = "OK"
     code = 0
+    min = ''
+    max = ''
     if warning:
         wstart, wend, winvert = parse(warning)
         #print wstart, wend, winvert
