@@ -57,8 +57,6 @@ def parse_atom(atom, default):
     return int(atom)
 
 def makeNagios(metric, warning, critical):
-    #print "OK|%s=%s;; " % (carbonCache, metric)
-
     severity = "OK"
     code = 0
     min = ''
@@ -92,7 +90,7 @@ def makeNagios(metric, warning, critical):
         max = cend
     else: critical = ''
 
-    print "%s|%s=%s;%s;%s;%s;%s; " % (severity, carbonCache, metric, warning, critical, min, max )
+    print "%s|%s=%s;%s;%s;%s;%s; " % (severity, datapointName, metric, warning, critical, min, max )
     sys.exit(code)
 
 
@@ -106,8 +104,8 @@ def main():
         help='Port to connect to on the web server')
     parser.add_option('-u', '--url', dest='url',
         help='URL to retrieve data from')
-    parser.add_option('-N', '--cache', dest='carboncache',
-        help='name of carbon cache')
+    parser.add_option('-N', '--datapoint-name', dest='datapointname',
+        help='datapoint name to return')
     parser.add_option('-n', '--none', dest='nulls',
         action='store_true', default=False,
         help='set null values to this')
@@ -126,8 +124,8 @@ def main():
         print >> sys.stderr, "You must specify the url."
         sys.exit(1)
 
-    global carbonCache
-    carbonCache = options.carboncache
+    global datapointName
+    datapointName = options.datapointname
 
     url = options.url + '&format=json'
 
