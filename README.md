@@ -7,7 +7,7 @@ Most of these scripts should be fairly obvious based on the name. I'll document 
 check_graphite.py:
 - fetch a datapoint from graphite and massage it into nagios format for monitoring tools that speak nagios (icinga, zenoss, and of course nagios.) Also does thresholding built in.
 
-interface-stats.py:
+interface_stats.py:
 - fetch the list of interfaces via on a system and then fetch all the normal useful stats for those interfaces.
 
 snmp_pickle.py:
