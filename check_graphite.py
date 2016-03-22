@@ -5,6 +5,7 @@ import json
 from httplib import HTTPConnection
 from optparse import OptionParser
 
+
 def fetchMetrics(host, port, url):
     connection = HTTPConnection(host, port)
     connection.request("GET", url)
@@ -28,10 +29,11 @@ def fetchMetrics(host, port, url):
 
 def processResponse(body, nulls):
     data = json.loads(body)
-    for metric, timestamp in data[0]['datapoints']:
-        if nulls and metric == None:
-            metric = 0
-        return metric
+    if not data[0]['datapoints'] and nulls:
+        return 0
+    else:
+        for metric, timestamp in data[0]['datapoints']:
+            return metric
 
 def parse(range):
     invert = False
@@ -63,7 +65,6 @@ def makeNagios(metric, warning, critical):
     max = ''
     if warning:
         wstart, wend, winvert = parse(warning)
-        #print wstart, wend, winvert
         if winvert:
             if metric > wstart or metric < wend:
                 severity = "WARNING"
@@ -77,7 +78,6 @@ def makeNagios(metric, warning, critical):
     else: warning = ''
     if critical:
         cstart, cend, cinvert = parse(critical)
-        #print cstart, cend, cinvert
         if cinvert:
             if metric > cstart or metric < cend:
                 severity = "CRITICAL"
@@ -90,7 +90,7 @@ def makeNagios(metric, warning, critical):
         max = cend
     else: critical = ''
 
-    print "%s|%s=%s;%s;%s;%s;%s; " % (severity, datapointName, metric, warning, critical, min, max )
+    print "%s|%s=%s;%s;%s;%s;%s; " % (severity, carbonCache, metric, warning, critical, min, max )
     sys.exit(code)
 
 
@@ -104,11 +104,11 @@ def main():
         help='Port to connect to on the web server')
     parser.add_option('-u', '--url', dest='url',
         help='URL to retrieve data from')
-    parser.add_option('-N', '--datapoint-name', dest='datapointname',
-        help='datapoint name to return')
+    parser.add_option('-N', '--cache', dest='carboncache',
+        help='name of carbon cache')
     parser.add_option('-n', '--none', dest='nulls',
         action='store_true', default=False,
-        help='set null values to this')
+        help='set null values to zero')
     parser.add_option('-c', '--critical', dest='critical',
         default=False,
         help='set range for critical threshold. [@][start:][end]')
@@ -124,10 +124,10 @@ def main():
         print >> sys.stderr, "You must specify the url."
         sys.exit(1)
 
-    global datapointName
-    datapointName = options.datapointname
+    global carbonCache
+    carbonCache = options.carboncache
 
-    url = options.url + '&format=json'
+    url = options.url + '&format=json&maxDataPoints=1'
 
     data = fetchMetrics(options.host, options.port, url)
     metrics = processResponse(data, options.nulls)
