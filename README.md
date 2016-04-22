@@ -11,6 +11,6 @@ interface_stats.py:
 - fetch the list of interfaces via snmp on a system and then fetch all the normal useful stats for those interfaces.
 
 snmp_pickle.py:
-- specify snmp oids and a matching label fore each oid and it will fetch them all and dump them into graphite.
+- specify snmp oids and a matching label for each oid and it will fetch them all and dump them into graphite.
 
 
