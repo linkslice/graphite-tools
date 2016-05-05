@@ -34,7 +34,8 @@ def fetchOID(host, community, secLevel, secName, version, authProtocol, authPass
                                PrivProto=privProtocol, PrivPass=privPassword, SecName=secName)
     else:
         print 'unknown version %s' % version
-
+        
+    currentTime = time.time()
     if not index:
         #interfaceList = '.1.3.6.1.2.1.2.2.1.1'
         interfaceList = '.1.3.6.1.2.1.2.2.1.2'
@@ -65,7 +66,6 @@ def fetchOID(host, community, secLevel, secName, version, authProtocol, authPass
                 result = float(x)
                 if verbose:
                     print >> sys.stderr, '%s = %s' % (type, result)
-                currentTime = time.time()
                 datapoint = '%s.%s' % (graphiteroot, type)
                 package.append((datapoint, (currentTime, result)))
             except Exception as uhoh:
