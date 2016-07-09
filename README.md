@@ -2,7 +2,7 @@
 miscellaneous graphite tools
 
 
-Most of these scripts should be fairly obvious based on the name. I'll document a few that are less so. The rest are typically run like so: ./script.py -H hostname -c snmpcommunity -G metricindex
+Most of these scripts should be fairly obvious based on the name. I'll document a few that are less so. The rest are typically run like so: ./script.py -H <hostname> -c <snmpcommunity> -G <metricindex.hostname>
 
 check_graphite.py:
 - fetch a datapoint from graphite and massage it into nagios format for monitoring tools that speak nagios (icinga, zenoss, and of course nagios.) Also does thresholding built in.
