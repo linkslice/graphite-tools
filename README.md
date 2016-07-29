@@ -14,3 +14,4 @@ snmp_pickle.py:
 - specify snmp oids and a matching label for each oid and it will fetch them all and dump them into graphite.
 
 
+The haproxy bits are run the same wasy as every other script in this repo. Please see the links in the readme for my haproxy zenpack for configuring haproxy to return stats via snmp.
