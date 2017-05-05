@@ -29,11 +29,19 @@ def fetchMetrics(host, port, url):
 
 def processResponse(body, nulls):
     data = json.loads(body)
-    if not data[0]['datapoints'] and nulls:
-        return 0
-    else:
-        for metric, timestamp in data[0]['datapoints']:
-            return metric
+    #if nulls and not data[0]['datapoints']:
+    #    return 0
+    #else:
+    #    for metric, timestamp in data[0]['datapoints']:
+    #        return metric
+    if not data:
+        print "no data returned"
+        sys.exit(1)
+    for metric, timestamp in data[0]['datapoints']:
+        if nulls and not metric:
+           return 0
+        else:
+           return metric 
 
 def parse(range):
     invert = False
@@ -89,11 +97,11 @@ def makeNagios(metric, warning, critical):
         min = cstart
         max = cend
     else: critical = ''
-
-    print "%s|%s=%s;%s;%s;%s;%s; " % (severity, dataPointName, metric, warning, critical, min, max )
+    
+    print "%s - %s|%s=%s;%s;%s;%s;%s; " % (severity, carbonCache, carbonCache, metric, warning, critical, min, max )
     sys.exit(code)
-
-
+    
+    
 
 def main():
     parser = OptionParser()
@@ -104,8 +112,8 @@ def main():
         help='Port to connect to on the web server')
     parser.add_option('-u', '--url', dest='url',
         help='URL to retrieve data from')
-    parser.add_option('-N', '--dataPointName', dest='datapointname',
-        help='name of data point to return')
+    parser.add_option('-N', '--cache', dest='carboncache',
+        help='name of carbon cache')
     parser.add_option('-n', '--none', dest='nulls',
         action='store_true', default=False,
         help='set null values to zero')
@@ -124,11 +132,11 @@ def main():
         print >> sys.stderr, "You must specify the url."
         sys.exit(1)
 
-    global dataPointName
-    dataPointName = options.datapointname
-
+    global carbonCache
+    carbonCache = options.carboncache
+    
     url = options.url + '&format=json&maxDataPoints=1'
-
+ 
     data = fetchMetrics(options.host, options.port, url)
     metrics = processResponse(data, options.nulls)
     makeNagios(metrics, options.warning, options.critical)
