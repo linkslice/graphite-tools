@@ -16,4 +16,4 @@ snmp_pickle.py:
 codahale_metrics.py
 - connect to codahale-style admin/metrics page and just feed all the things.
 
-*The haproxy bits are run the same way as every other script in this repo. Please see the links in the readme for my haproxy zenpack for configuring haproxy to return stats via snmp.
+*The haproxy bits are run the same way as every other script in this repo. Please see the links in the readme for my haproxy zenpack for configuring haproxy to return stats via snmp. https://github.com/linkslice/ZenPacks.community.HAProxy
