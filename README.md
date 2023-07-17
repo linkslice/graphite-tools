@@ -9,6 +9,11 @@ Most of these scripts should be fairly obvious based on the name. I'll document 
 check_graphite.py:
 - fetch a datapoint from graphite and massage it into nagios format for monitoring tools that speak nagios (icinga, zenoss, and of course nagios.) Also does thresholding built in.
 
+```
+$ python check_graphite.py -H 10.10.10.12 -p 80 -u /render/\?width=586\&height=308\&_salt=1689629212.962\&target=carbon.agents.83fe1b18a7c4-a.metricsReceived -c20 -w14 -n -N DatapointName
+CRITICAL - DatapointName|DatapointName=48.60528455284553;14;20;0;20;
+```
+
 interface_stats.py:
 - fetch the list of interfaces via snmp on a system and then fetch all the normal useful stats for those interfaces.
 
