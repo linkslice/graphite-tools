@@ -19,7 +19,7 @@ package = ([])
 def fetchOID(host, community, graphiteroot, frontend, verbose):
 
     if verbose:
-        print >> sys.stderr, 'connecting to host: %s using community: %s' % ( host, community )
+        print('connecting to host: %s using community: %s' % ( host, community ), file=sys.stderr)
 
     statsTable = {
         'bytesIn': '1.3.6.1.4.1.29385.106.1.0.8',
@@ -66,12 +66,12 @@ def fetchOID(host, community, graphiteroot, frontend, verbose):
                 result = [x[0] for x in snmp.get(vars)]
                 result = float(x)
                 if verbose:
-                    print >> sys.stderr, '%s %s = %s' % (vs.val, type, result)
+                    print('%s %s = %s' % (vs.val, type, result), file=sys.stderr)
                 #currentTime = time.time()
                 datapoint = '%s.%s.%s' % (graphiteroot, vs.val, type)
                 package.append((datapoint, (currentTime, result)))
             except Exception as uhoh:
-                print >> sys.stderr, "could not get oid: %s" % uhoh
+                print("could not get oid: %s" % uhoh, file=sys.stderr)
                 #sys.exit(1)
 
     return package, currentTime, result
@@ -79,7 +79,7 @@ def fetchOID(host, community, graphiteroot, frontend, verbose):
 
 def makePickle(datapoint, currentTime, data, verbose, debug):
     if debug:
-        print >> sys.stderr, 'storing pickle in \'data.p\''
+        print('storing pickle in \'data.p\'', file=sys.stderr)
         fh = open('data.p', 'wb')
         pickle.dump(package, fh)
         sys.exit()
@@ -89,16 +89,16 @@ def makePickle(datapoint, currentTime, data, verbose, debug):
 def sendPickle(carbonServer, carbonPort, shippingPackage, verbose):
     packageSize = struct.pack('!L', len(shippingPackage))
     if verbose:
-        print >> sys.stderr, 'connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort )
+        print('connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort ), file=sys.stderr)
     try:
         s = socket.socket()
         s.connect((carbonServer, carbonPort))
         s.sendall(packageSize)
         s.sendall(shippingPackage)
         if verbose:
-            print >> sys.stderr, 'sending pickle...'
+            print('sending pickle...', file=sys.stderr)
     except Exception as uhoh:
-        print "Could not connect to carbon server: %s" % uhoh
+        print("Could not connect to carbon server: %s" % uhoh)
         sys.exit(1)
 
 def main():

@@ -22,7 +22,7 @@ def main():
 
     i = 0
     while i < len(data):
-        print ("%s %s %s") % (data[i][0], data[i][1][1], data[i][1][0])
+        print(("%s %s %s") % (data[i][0], data[i][1][1], data[i][1][0]))
         i = i + 1 
 
 if __name__ == '__main__':

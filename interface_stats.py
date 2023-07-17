@@ -14,7 +14,7 @@ package = ([])
 
 def fetchOID(host, community, secLevel, secName, version, authProtocol, authPassword, privProtocol, privPassword, index, graphiteroot, verbose, debug):
     if verbose:
-        print >> sys.stderr, 'connecting to host: %s using community: %s' % ( host, community )
+        print('connecting to host: %s using community: %s' % ( host, community ), file=sys.stderr)
 
     ifTable = {
         'ifHCInOctets': '.1.3.6.1.2.1.31.1.1.1.6',
@@ -33,7 +33,7 @@ def fetchOID(host, community, secLevel, secName, version, authProtocol, authPass
         snmp = netsnmp.Session(DestHost=host, Version=3, SecLevel=secLevel, AuthProto=authProtocol, AuthPass=authPassword,
                                PrivProto=privProtocol, PrivPass=privPassword, SecName=secName)
     else:
-        print 'unknown version %s' % version
+        print('unknown version %s' % version)
         
     currentTime = time.time()
     if not index:
@@ -50,12 +50,12 @@ def fetchOID(host, community, secLevel, secName, version, authProtocol, authPass
                     result = [x[0] for x in snmp.get(vars)]
                     result = float(x)
                     if verbose:
-                        print >> sys.stderr, '%s = %s' % (type, result)
+                        print('%s = %s' % (type, result), file=sys.stderr)
                     currentTime = time.time()
                     datapoint = '%s.%s.%s' % (graphiteroot, vs.val, type)
                     package.append((datapoint, (currentTime, result)))
                 except Exception as uhoh:
-                    print >> sys.stderr, "could not get oid: %s" % uhoh
+                    print("could not get oid: %s" % uhoh, file=sys.stderr)
                     sys.exit(1)
 
     else:
@@ -65,18 +65,18 @@ def fetchOID(host, community, secLevel, secName, version, authProtocol, authPass
                 result = [x[0] for x in snmp.get(vars)]
                 result = float(x)
                 if verbose:
-                    print >> sys.stderr, '%s = %s' % (type, result)
+                    print('%s = %s' % (type, result), file=sys.stderr)
                 datapoint = '%s.%s' % (graphiteroot, type)
                 package.append((datapoint, (currentTime, result)))
             except Exception as uhoh:
-                print >> sys.stderr, "could not get oid: %s" % uhoh
+                print("could not get oid: %s" % uhoh, file=sys.stderr)
                 sys.exit(1)
     return package, currentTime, result
 
 
 def makePickle(datapoint, currentTime, data, verbose, debug):
     if debug:
-        print >> sys.stderr, 'storing pickle in \'data.p\''
+        print('storing pickle in \'data.p\'', file=sys.stderr)
         fh = open('data.p', 'wb')
         pickle.dump(package, fh)
     shippingPackage = pickle.dumps(package, 1)
@@ -85,16 +85,16 @@ def makePickle(datapoint, currentTime, data, verbose, debug):
 def sendPickle(carbonServer, carbonPort, shippingPackage, verbose, debug):
     packageSize = struct.pack('!L', len(shippingPackage))
     if verbose:
-        print >> sys.stderr, 'connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort )
+        print('connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort ), file=sys.stderr)
     try:
         s = socket.socket()
         s.connect((carbonServer, carbonPort))
         s.sendall(packageSize)
         s.sendall(shippingPackage)
         if verbose:
-            print >> sys.stderr, 'sending pickle...'
+            print('sending pickle...', file=sys.stderr)
     except Exception as uhoh:
-        print "Could not connect to carbon server: %s" % uhoh
+        print("Could not connect to carbon server: %s" % uhoh)
         sys.exit(1)
 
 def main():

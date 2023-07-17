@@ -7,6 +7,6 @@ parser.add_option('-t', '--test', action='append')
 
 options, args = parser.parse_args()
 for i, opt in enumerate(options.test):
-    print 'option %s: %s' % (i, opt)
+    print('option %s: %s' % (i, opt))
 
 

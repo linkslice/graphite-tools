@@ -14,7 +14,7 @@ package = ([])
 
 def fetchOID(host, community, oid, name):
     if options.verbose:
-        print >> sys.stderr, 'connecting to host: %s using community: %s' % ( host, community )
+        print('connecting to host: %s using community: %s' % ( host, community ), file=sys.stderr)
     snmp = netsnmp.Session(DestHost=host, Version=2, Community=community)
     count = 0
     while count < len(oid):
@@ -24,20 +24,20 @@ def fetchOID(host, community, oid, name):
             result = [x[0] for x in snmp.get(vars)]
             result = float(x)
             if options.verbose:
-                print >> sys.stderr, '%s = %s' % (oid[count], result)
+                print('%s = %s' % (oid[count], result), file=sys.stderr)
             currentTime = time.time()
             datapoint = '%s.%s' % (options.graphiteroot, name[count])
             package.append((datapoint, (currentTime, result)))
             count += 1
         except Exception as uhoh:
-            print >> sys.stderr, "could not get oid: %s" % uhoh
+            print("could not get oid: %s" % uhoh, file=sys.stderr)
             sys.exit(1)
     makePickle(package, currentTime, result)
     
 
 def makePickle(datapoint, currentTime, data):
     if options.debug:
-        print >> sys.stderr, 'storing pickle in \'data.p\''
+        print('storing pickle in \'data.p\'', file=sys.stderr)
         fh = open('data.p', 'wb')
         pickle.dump(package, fh)
     shippingPackage = pickle.dumps(package, 1)
@@ -46,16 +46,16 @@ def makePickle(datapoint, currentTime, data):
 def sendPickle(carbonServer, carbonPort, shippingPackage):
     packageSize = struct.pack('!L', len(shippingPackage))
     if options.verbose:
-        print >> sys.stderr, 'connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort )
+        print('connecting to carbon server: %s on port: %s' % ( carbonServer, carbonPort ), file=sys.stderr)
     try:
         s = socket.socket()
         s.connect((carbonServer, carbonPort))
         s.sendall(packageSize)
         s.sendall(shippingPackage)
         if options.verbose:
-            print >> sys.stderr, 'sending pickle...'
+            print('sending pickle...', file=sys.stderr)
     except Exception as uhoh:
-        print "Could not connect to carbon server: %s" % uhoh
+        print("Could not connect to carbon server: %s" % uhoh)
         sys.exit(1)
 
 if __name__ == '__main__':
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     #    sys.exit()
 
     if len(options.oid) != len(options.name):
-        print >> sys.stderr, "Critical: you must 'name' each 'oid'"
+        print("Critical: you must 'name' each 'oid'", file=sys.stderr)
         sys.exit(1)
 
     fetchOID(options.host, options.community, options.oid, options.name)

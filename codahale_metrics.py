@@ -14,7 +14,7 @@ import re
 import sys
 from base64 import b64encode
 from optparse import OptionParser
-import urllib2, httplib 
+import urllib.request, urllib.error, urllib.parse, http.client 
 import json
 
 socket.setdefaulttimeout(30.0)
@@ -23,17 +23,17 @@ def processResponse(data,graphiteRoot,pickleport):
     timestamp = time.time()
     output = ([])
 
-    if options.verbose: print >> sys.stderr, data
+    if options.verbose: print(data, file=sys.stderr)
     d = json.loads(data)
 
     try:
         # Step through JSON objects and sub objects and sub objects.
-        for everyone, two in d.iteritems():
+        for everyone, two in d.items():
             if type(two).__name__=='dict':
-                for attr, value in two.items():
+                for attr, value in list(two.items()):
                     if type(value).__name__=='dict':
                         try:
-                            for left, right in value.items():
+                            for left, right in list(value.items()):
                                 if not ((type(right).__name__ == "float") or (type(right).__name__ == "int")): continue
                                 # strip unicode stuff
                                 if '.' in everyone:
@@ -60,7 +60,7 @@ def processResponse(data,graphiteRoot,pickleport):
                 output.append((blah, (timestamp,two)))
     # probably not needed any longer
     except KeyError:
-        print >> sys.stderr, "Critical: Key not found: %s" % resource
+        print("Critical: Key not found: %s" % resource, file=sys.stderr)
         sys.exit(1)
 
     finally:
@@ -82,9 +82,9 @@ def processResponse(data,graphiteRoot,pickleport):
         sys.exit(0)
 
 
-class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
+class HTTPSClientAuthHandler(urllib.request.HTTPSHandler):
     def __init__(self, key, cert):
-        urllib2.HTTPSHandler.__init__(self)
+        urllib.request.HTTPSHandler.__init__(self)
         self.key = key
         self.cert = cert
 
@@ -92,7 +92,7 @@ class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host, timeout=300):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
+        return http.client.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
 if __name__ == '__main__':
     
@@ -132,11 +132,11 @@ if __name__ == '__main__':
     options, args = parser.parse_args()
 
     if not options.host:
-        print >> sys.stderr, "Critical: You must specify the host."
+        print("Critical: You must specify the host.", file=sys.stderr)
         sys.exit(1)
     
     if not options.url:
-        print >> sys.stderr, "You must specify a URL."
+        print("You must specify a URL.", file=sys.stderr)
         sys.exit(1)
     else:
         url = options.url
@@ -153,30 +153,30 @@ if __name__ == '__main__':
     # default to use SSL if the port is 443
     if options.usingssl or options.port == '443':
         if not options.key:
-            from httplib import HTTPSConnection
+            from http.client import HTTPSConnection
             try:
                 connection = HTTPSConnection(options.host, options.port)
                 connection.request("GET", url, None, headers)
             except:
-                print >> sys.stderr, "Unable to make HTTPS connection to https://%s:%s%s" % ( options.host, options.port, url )
+                print("Unable to make HTTPS connection to https://%s:%s%s" % ( options.host, options.port, url ), file=sys.stderr)
                 sys.exit(1)
         else:
-            import urllib2
-            from httplib import HTTPSConnection
-            opener = urllib2.build_opener(HTTPSClientAuthHandler(options.key, options.client))
+            import urllib.request, urllib.error, urllib.parse
+            from http.client import HTTPSConnection
+            opener = urllib.request.build_opener(HTTPSClientAuthHandler(options.key, options.client))
             connectString = "https://%s:%s%s" % (options.host, options.port, options.url)
             try:
                 response = opener.open(connectString)
             except:
-                print >> sys.stderr, "Could not connect to %s" % connectString
+                print("Could not connect to %s" % connectString, file=sys.stderr)
                 sys.exit(2)
     else:
-        from httplib import HTTPConnection
+        from http.client import HTTPConnection
         try:
             connection = HTTPConnection(options.host, options.port)
             connection.request("GET", url, None, headers)
         except Exception as e:
-            print >> sys.stderr, "Unable to make HTTP connection to http://%s:%s%s because: %s" % ( options.host, options.port, url, e )
+            print("Unable to make HTTP connection to http://%s:%s%s because: %s" % ( options.host, options.port, url, e ), file=sys.stderr)
             sys.exit(1)
 
     graphiteRoot = "%s.%s" % ( options.graphiteRoot, options.host )
@@ -189,11 +189,11 @@ if __name__ == '__main__':
     if returnCode == 200:
         processResponse(response.read(),graphiteRoot,options.pickleport)            
     elif returnCode == 401:
-        print "Invalid username or password."
+        print("Invalid username or password.")
         sys.exit(1)
     elif returnCode == 404:
-        print "404 not found."
+        print("404 not found.")
         sys.exit(1)
     else:
-        print "Web service error %: " % returnCode #, (None if not response.reason else response.reason) )
+        print("Web service error %: " % returnCode) #, (None if not response.reason else response.reason) )
         sys.exit(1)

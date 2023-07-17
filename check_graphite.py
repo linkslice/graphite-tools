@@ -2,7 +2,7 @@
 
 import sys
 import json
-from httplib import HTTPConnection
+from http.client import HTTPConnection
 from optparse import OptionParser
 
 
@@ -15,15 +15,15 @@ def fetchMetrics(host, port, url):
         try:
             data = response.read()
         except Exception as uhoh:
-            print "unknown error, possible empty response?: %s" % uhoh
+            print("unknown error, possible empty response?: %s" % uhoh)
     elif response.status == 401:
-        print "Invalid username or password."
+        print("Invalid username or password.")
         sys.exit(1)
     elif response.status == 404:
-        print "Web service not found."
+        print("Web service not found.")
         sys.exit(1)
     else:
-        print "Web service error (%d): %s" % (response.status, response.reason)
+        print("Web service error (%d): %s" % (response.status, response.reason))
         sys.exit(1)
     return data
 
@@ -35,7 +35,7 @@ def processResponse(body, nulls):
     #    for metric, timestamp in data[0]['datapoints']:
     #        return metric
     if not data:
-        print "no data returned"
+        print("no data returned")
         sys.exit(1)
     for metric, timestamp in data[0]['datapoints']:
         if nulls and not metric:
@@ -98,7 +98,7 @@ def makeNagios(metric, warning, critical):
         max = cend
     else: critical = ''
     
-    print "%s - %s|%s=%s;%s;%s;%s;%s; " % (severity, carbonCache, carbonCache, metric, warning, critical, min, max )
+    print("%s - %s|%s=%s;%s;%s;%s;%s; " % (severity, carbonCache, carbonCache, metric, warning, critical, min, max ))
     sys.exit(code)
     
     
@@ -126,10 +126,10 @@ def main():
     options, args = parser.parse_args()
 
     if not options.host:
-        print >> sys.stderr, "You must specify the host."
+        print("You must specify the host.", file=sys.stderr)
         sys.exit(1)
     elif not options.url:
-        print >> sys.stderr, "You must specify the url."
+        print("You must specify the url.", file=sys.stderr)
         sys.exit(1)
 
     global carbonCache
