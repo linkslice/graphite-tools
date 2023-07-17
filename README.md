@@ -1,4 +1,6 @@
 # graphite-tools
+**note: checkout develop branch for python3 version. Bug reports and diffs welcome.
+
 miscellaneous graphite tools
 
 
